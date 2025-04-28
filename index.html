@@ -1,78 +1,337 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Caesar Cipher Encoder/Decoder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+      :root {
+        --primary-color: #4CAF50;
+        --primary-hover: #45a049;
+        --error-color: #f44336;
+        --text-color: #333;
+        --background-color: #f5f5f5;
+        --border-color: #ddd;
+        --container-bg: white;
+      }
+
+      [data-theme="dark"] {
+        --text-color: #f5f5f5;
+        --background-color: #1a1a1a;
+        --border-color: #444;
+        --container-bg: #2d2d2d;
+      }
+
       body {
         font-family: Arial, sans-serif;
         max-width: 600px;
         margin: 20px auto;
         padding: 20px;
+        color: var(--text-color);
+        line-height: 1.6;
+        background-color: var(--background-color);
+        transition: background-color 0.3s, color 0.3s;
       }
+
       .container {
-        background-color: #f5f5f5;
-        padding: 20px;
+        background-color: var(--container-bg);
+        padding: 30px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: background-color 0.3s;
       }
+
+      h1 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        position: relative;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
       textarea {
         width: 100%;
+        padding: 12px;
+        margin: 5px 0;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 100px;
+        transition: border-color 0.3s;
+        background-color: var(--container-bg);
+        color: var(--text-color);
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+      }
+
+      .char-counter {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        font-size: 12px;
+        color: var(--text-color);
+        opacity: 0.7;
+      }
+
+      input[type="number"] {
+        width: 80px;
         padding: 8px;
         margin: 5px 0;
-        border: 1px solid #ddd;
+        border: 2px solid var(--border-color);
         border-radius: 4px;
+        background-color: var(--container-bg);
+        color: var(--text-color);
       }
-      input[type="number"] {
-        width: 60px;
-        padding: 5px;
-        margin: 5px 0;
-      }
+
       .radio-group {
-        margin: 10px 0;
+        margin: 15px 0;
+        display: flex;
+        gap: 20px;
       }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
       button {
-        padding: 8px 16px;
-        background-color: #4CAF50;
+        padding: 12px 24px;
+        background-color: var(--primary-color);
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
-        margin-top: 10px;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        flex: 1;
       }
+
       button:hover {
-        background-color: #45a049;
+        background-color: var(--primary-hover);
       }
-      label {
-        display: block;
-        margin: 5px 0;
+
+      button:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
+
+      .error-message {
+        color: var(--error-color);
+        margin-top: 5px;
+        font-size: 14px;
+        display: none;
+      }
+
+      .success-message {
+        color: var(--primary-color);
+        margin-top: 5px;
+        font-size: 14px;
+        display: none;
+      }
+
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .help-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .help-content {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background-color: var(--container-bg);
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+      }
+
+      .help-content h2 {
+        color: var(--primary-color);
+        margin-top: 0;
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 15px;
+        }
+        
+        .radio-group {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        .theme-toggle, .help-toggle {
+          position: static;
+          margin-bottom: 10px;
+        }
       }
     </style>
   </head>
   <body>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+    <button class="help-toggle" onclick="toggleHelp()">Help</button>
+    
     <div class="container">
       <h1>Caesar Cipher Encoder/Decoder</h1>
-      <form name="caeserForm" id="ceaserForm">
-        <label for="userMessage">Enter Message:</label>
-        <textarea id="userMessage" rows="4" placeholder="Enter your message here..." oninput="enDeCode()"></textarea>
+      
+      <div class="help-content" id="helpContent">
+        <h2>How to Use</h2>
+        <p>The Caesar Cipher is one of the simplest and most widely known encryption techniques. It works by shifting each letter in the plaintext by a fixed number of positions down the alphabet.</p>
         
-        <div class="radio-group">
-          <label>
-            <input type="radio" name="code" id="encode" checked onchange="enDeCode()" />
-            Encode
-          </label>
-          <label>
-            <input type="radio" name="code" id="decode" onchange="enDeCode()" />
-            Decode
-          </label>
+        <h3>Encoding</h3>
+        <p>To encode a message:</p>
+        <ol>
+          <li>Enter your message in the input field</li>
+          <li>Choose a key between 0 and 25</li>
+          <li>Select "Encode"</li>
+          <li>The encoded message will appear in the output field</li>
+        </ol>
+        
+        <h3>Decoding</h3>
+        <p>To decode a message:</p>
+        <ol>
+          <li>Enter the encoded message in the input field</li>
+          <li>Enter the same key that was used for encoding</li>
+          <li>Select "Decode"</li>
+          <li>The original message will appear in the output field</li>
+        </ol>
+        
+        <h3>Example</h3>
+        <p>With a key of 3:</p>
+        <ul>
+          <li>"HELLO" encodes to "KHOOR"</li>
+          <li>"KHOOR" decodes to "HELLO"</li>
+        </ul>
+      </div>
+
+      <form name="caeserForm" id="ceaserForm" role="form" aria-label="Caesar Cipher Form">
+        <div class="form-group">
+          <label for="userMessage">Enter Message:</label>
+          <textarea 
+            id="userMessage" 
+            rows="4" 
+            placeholder="Enter your message here..." 
+            oninput="enDeCode(); updateCharCount()"
+            aria-label="Message input"
+            aria-required="true"
+            maxlength="1000"
+          ></textarea>
+          <div class="char-counter" id="charCounter">0/1000</div>
         </div>
         
-        <label for="userKey">Key (0-25):</label>
-        <input type="number" min="0" max="25" id="userKey" value="1" onchange="enDeCode()" />
+        <div class="form-group">
+          <label>Operation:</label>
+          <div class="radio-group" role="radiogroup" aria-label="Choose operation">
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                name="code" 
+                id="encode" 
+                checked 
+                onchange="enDeCode()"
+                aria-label="Encode"
+              />
+              Encode
+            </label>
+            <label class="radio-option">
+              <input 
+                type="radio" 
+                name="code" 
+                id="decode" 
+                onchange="enDeCode()"
+                aria-label="Decode"
+              />
+              Decode
+            </label>
+          </div>
+        </div>
         
-        <label for="output">Output:</label>
-        <textarea id="output" rows="4" readonly></textarea>
+        <div class="form-group">
+          <label for="userKey">Key (0-25):</label>
+          <input 
+            type="number" 
+            min="0" 
+            max="25" 
+            id="userKey" 
+            value="1" 
+            onchange="enDeCode()"
+            aria-label="Cipher key"
+            aria-required="true"
+          />
+          <div id="keyError" class="error-message" role="alert">
+            Key must be between 0 and 25
+          </div>
+        </div>
         
-        <button type="button" onclick="clearForm()">Clear</button>
+        <div class="form-group">
+          <label for="output">Output:</label>
+          <textarea 
+            id="output" 
+            rows="4" 
+            readonly
+            aria-label="Cipher output"
+          ></textarea>
+          <div id="successMessage" class="success-message" role="status">
+            Message processed successfully
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button 
+            type="button" 
+            onclick="clearForm()"
+            aria-label="Clear form"
+          >
+            Clear
+          </button>
+          <button 
+            type="button" 
+            onclick="copyToClipboard()"
+            aria-label="Copy to clipboard"
+          >
+            Copy Output
+          </button>
+        </div>
       </form>
     </div>
     <script src="ceaserCipher.js"></script>
