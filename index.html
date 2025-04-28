@@ -1,24 +1,80 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Caesar Cipher Encoder/Decoder</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+      .container {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      input[type="number"] {
+        width: 60px;
+        padding: 5px;
+        margin: 5px 0;
+      }
+      .radio-group {
+        margin: 10px 0;
+      }
+      button {
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      label {
+        display: block;
+        margin: 5px 0;
+      }
+    </style>
+  </head>
   <body>
-    <form name="caeserForm" id="ceaserForm">
-      <label for="userMessage">Enter Message:</label><br />
-      <textarea id="userMessage" rows="4" cols="50" oninput="enDeCode()">
-      </textarea>
-      <br/> <br/>
-      <label for="encode">Encode:</label>
-      <input type="radio" name="code" id="encode" checked onchange="enDeCode()" />
-      <label for="decode">Decode:</label>
-      <input type="radio" name="code" id="decode" onchange="enDeCode()" /> 
-      <br/> <br/>
-      <label for="userKey">Key:</label>
-      <input type="number" min="0" max="26" id="userKey" value="1" onchange="enDeCode()" />
-      <br/> <br/>
-      <label for="output">Output:</label><br />
-      <textarea id="output" rows="4" cols="50">
-      </textarea>
-
-    </form>
+    <div class="container">
+      <h1>Caesar Cipher Encoder/Decoder</h1>
+      <form name="caeserForm" id="ceaserForm">
+        <label for="userMessage">Enter Message:</label>
+        <textarea id="userMessage" rows="4" placeholder="Enter your message here..." oninput="enDeCode()"></textarea>
+        
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="code" id="encode" checked onchange="enDeCode()" />
+            Encode
+          </label>
+          <label>
+            <input type="radio" name="code" id="decode" onchange="enDeCode()" />
+            Decode
+          </label>
+        </div>
+        
+        <label for="userKey">Key (0-25):</label>
+        <input type="number" min="0" max="25" id="userKey" value="1" onchange="enDeCode()" />
+        
+        <label for="output">Output:</label>
+        <textarea id="output" rows="4" readonly></textarea>
+        
+        <button type="button" onclick="clearForm()">Clear</button>
+      </form>
+    </div>
     <script src="ceaserCipher.js"></script>
   </body>
 </html>
