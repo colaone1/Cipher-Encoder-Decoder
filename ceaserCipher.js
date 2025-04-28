@@ -217,7 +217,7 @@ window.onload = function() {
  * Test function to verify cipher functionality
  */
 function testCipher() {
-  console.log("Running cipher tests...");
+  console.log("Running comprehensive cipher tests...");
   
   // Test cases for rolling cipher
   const testCases = [
@@ -284,6 +284,62 @@ function testCipher() {
       incrementKey: 1,
       encode: true,
       expected: "IgPmO"
+    },
+    {
+      name: "Numbers in Input",
+      input: "Hello123",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "Igpmo123"
+    },
+    {
+      name: "Special Characters Only",
+      input: "!@#$%^&*()",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "!@#$%^&*()"
+    },
+    {
+      name: "Multiple Spaces",
+      input: "hello    world",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "igpmo    xpsme"
+    },
+    {
+      name: "Tabs and Newlines",
+      input: "hello\tworld\nhello",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "igpmo\txpsme\nigpmo"
+    },
+    {
+      name: "Maximum Length Input",
+      input: "a".repeat(1000),
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "b".repeat(1000)
+    },
+    {
+      name: "Unicode Characters",
+      input: "Hello 🌍 World",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "Igpmo 🌍 Xpsme"
+    },
+    {
+      name: "Complex Rolling Pattern",
+      input: "abcdefghijklmnopqrstuvwxyz",
+      baseKey: 1,
+      incrementKey: 2,
+      encode: true,
+      expected: "bdfhjlprtvxzacegikmoqsuwy"
     }
   ];
 
@@ -318,14 +374,30 @@ function testCipher() {
       baseKey: "1",
       incrementKey: "1.5",
       shouldError: true
+    },
+    {
+      name: "Invalid Base Key (String)",
+      baseKey: "abc",
+      incrementKey: "1",
+      shouldError: true
+    },
+    {
+      name: "Whitespace Keys",
+      baseKey: "  ",
+      incrementKey: "  ",
+      shouldError: true
     }
   ];
 
   // Run all tests
   let allTestsPassed = true;
+  let testCount = 0;
+  let passedCount = 0;
 
   // Test cipher functionality
+  console.log("\nTesting Cipher Functionality:");
   for (const test of testCases) {
+    testCount++;
     const result = testCipherCase(test.input, test.baseKey, test.incrementKey, test.encode);
     if (result !== test.expected) {
       console.error(`❌ Test Failed: ${test.name}
@@ -338,11 +410,14 @@ function testCipher() {
       allTestsPassed = false;
     } else {
       console.log(`✅ Test Passed: ${test.name}`);
+      passedCount++;
     }
   }
 
   // Test error handling
+  console.log("\nTesting Error Handling:");
   for (const test of errorTests) {
+    testCount++;
     const errorElement = document.getElementById("keyError");
     errorElement.style.display = "none";
     document.getElementById("baseKey").value = test.baseKey;
@@ -355,13 +430,21 @@ function testCipher() {
       allTestsPassed = false;
     } else {
       console.log(`✅ Error Test Passed: ${test.name}`);
+      passedCount++;
     }
   }
 
+  // Print test summary
+  console.log("\nTest Summary:");
+  console.log(`Total Tests: ${testCount}`);
+  console.log(`Passed: ${passedCount}`);
+  console.log(`Failed: ${testCount - passedCount}`);
+  console.log(`Pass Rate: ${((passedCount / testCount) * 100).toFixed(2)}%`);
+
   if (allTestsPassed) {
-    console.log("🎉 All tests passed successfully!");
+    console.log("\n🎉 All tests passed successfully!");
   } else {
-    console.log("⚠️ Some tests failed. Please check the error messages above.");
+    console.log("\n⚠️ Some tests failed. Please check the error messages above.");
   }
 }
 
