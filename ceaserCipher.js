@@ -1,7 +1,13 @@
-function enDeCode(){
+/**
+ * Main function to encode or decode text using the Rolling Caesar Cipher
+ * Handles input validation, error messages, and output generation
+ */
+function enDeCode() {
+  // Get input elements and values
   let userString = document.getElementById("userMessage").value;
   let encode = document.getElementById("encode");
-  let userKey = document.getElementById("userKey");
+  let baseKey = document.getElementById("baseKey");
+  let incrementKey = document.getElementById("incrementKey");
   let keyError = document.getElementById("keyError");
   let successMessage = document.getElementById("successMessage");
   let output = document.getElementById("output");
@@ -11,39 +17,54 @@ function enDeCode(){
   successMessage.style.display = "none";
   output.value = "";
 
-  // Validate key
-  const keyValue = userKey.value.trim();
-  if (keyValue === "" || isNaN(keyValue) || keyValue < 0 || keyValue > 25 || !Number.isInteger(Number(keyValue))) {
+  // Validate base key input
+  const baseKeyValue = parseInt(baseKey.value.trim());
+  if (isNaN(baseKeyValue) || baseKeyValue < 0 || baseKeyValue > 25) {
     keyError.style.display = "block";
-    keyError.textContent = keyValue === "" ? "Key is required" : "Key must be an integer between 0 and 25";
+    keyError.textContent = "Base key must be an integer between 0 and 25";
     return;
   }
 
-  const flag = encode.checked;
-  let outputMessage = [];
+  // Validate increment key input
+  const incrementKeyValue = parseInt(incrementKey.value.trim());
+  if (isNaN(incrementKeyValue) || incrementKeyValue < 0 || incrementKeyValue > 25) {
+    keyError.style.display = "block";
+    keyError.textContent = "Increment key must be an integer between 0 and 25";
+    return;
+  }
 
   // Handle empty input
   if (!userString.trim()) {
     return;
   }
 
+  // Process each character in the input string
+  const flag = encode.checked;
+  let outputMessage = [];
   for (let i = 0; i < userString.length; i++) {
-    outputMessage.push(codeLetter(userString[i], keyValue, flag));
+    // Calculate the current key by adding the increment for each position
+    const currentKey = (baseKeyValue + (i * incrementKeyValue)) % 26;
+    outputMessage.push(codeLetter(userString[i], currentKey, flag));
   }
 
+  // Display results
   const result = outputMessage.join("");
   output.value = result;
   
-  // Show success message only if there's actual output
+  // Show success message if there's actual output
   if (result.trim()) {
     successMessage.style.display = "block";
   }
 }
 
+/**
+ * Clears all form inputs and resets the UI state
+ */
 function clearForm() {
   document.getElementById("userMessage").value = "";
   document.getElementById("output").value = "";
-  document.getElementById("userKey").value = "1";
+  document.getElementById("baseKey").value = "1";
+  document.getElementById("incrementKey").value = "1";
   document.getElementById("encode").checked = true;
   document.getElementById("keyError").style.display = "none";
   document.getElementById("successMessage").style.display = "none";
@@ -52,21 +73,37 @@ function clearForm() {
   document.getElementById("userMessage").focus();
 }
 
-function convertIndexToLetter(index){
-  let alphabet = ["a", "b", "c", "d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x", "y","z"];
-  let letter = alphabet[index];
-  return letter;
+/**
+ * Converts a numeric index to its corresponding letter in the alphabet
+ * @param {number} index - The index to convert (0-25)
+ * @returns {string} The corresponding letter
+ */
+function convertIndexToLetter(index) {
+  const alphabet = ["a", "b", "c", "d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x", "y","z"];
+  return alphabet[index];
 }
 
-function convertLetterToIndex(letter){
-  let alphabet = ["a", "b", "c", "d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x", "y","z"];
-  index = alphabet.indexOf(letter);
-  return index;
+/**
+ * Converts a letter to its corresponding index in the alphabet
+ * @param {string} letter - The letter to convert
+ * @returns {number} The corresponding index (0-25)
+ */
+function convertLetterToIndex(letter) {
+  const alphabet = ["a", "b", "c", "d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x", "y","z"];
+  return alphabet.indexOf(letter);
 }
 
+/**
+ * Calculates the new index after applying the Caesar Cipher shift
+ * @param {string} letter - The letter to shift
+ * @param {number} userKey - The shift key (0-25)
+ * @param {boolean} encode - Whether to encode (true) or decode (false)
+ * @returns {number} The new index after shifting
+ */
 function calculateNewIndex(letter, userKey, encode) {
   let index = Number(convertLetterToIndex(letter));
 
+  // Apply shift based on encode/decode
   if (encode) { 
     index = index + Number(userKey); 
   } else {
@@ -78,9 +115,16 @@ function calculateNewIndex(letter, userKey, encode) {
   return index;
 }
 
+/**
+ * Applies the Caesar Cipher to a single character
+ * @param {string} letter - The character to process
+ * @param {number} userKey - The shift key (0-25)
+ * @param {boolean} flag - Whether to encode (true) or decode (false)
+ * @returns {string} The processed character
+ */
 function codeLetter(letter, userKey, flag) {
   // Check if the character is a letter
-  let letterRegEx = /[a-zA-Z]/;
+  const letterRegEx = /[a-zA-Z]/;
   
   if (!letterRegEx.test(letter)) {
     return letter;
@@ -90,6 +134,7 @@ function codeLetter(letter, userKey, flag) {
   const isUpperCase = letter === letter.toUpperCase();
   letter = letter.toLowerCase();
   
+  // Calculate and apply the shift
   let newIndex = calculateNewIndex(letter, userKey, flag);
   let codedLetter = convertIndexToLetter(newIndex);
   
@@ -97,314 +142,9 @@ function codeLetter(letter, userKey, flag) {
   return isUpperCase ? codedLetter.toUpperCase() : codedLetter;
 }
 
-// Test function to verify cipher functionality
-function testCipher() {
-  const testCases = [
-    {
-      name: "Basic Encoding",
-      input: "hello world",
-      key: 1,
-      encode: true,
-      expected: "ifmmp xpsme"
-    },
-    {
-      name: "Basic Decoding",
-      input: "ifmmp xpsme",
-      key: 1,
-      encode: false,
-      expected: "hello world"
-    },
-    {
-      name: "Alphabet Wrap Encoding",
-      input: "xyz",
-      key: 3,
-      encode: true,
-      expected: "abc"
-    },
-    {
-      name: "Alphabet Wrap Decoding",
-      input: "abc",
-      key: 3,
-      encode: false,
-      expected: "xyz"
-    },
-    {
-      name: "Special Characters",
-      input: "Hello, World! 123",
-      key: 1,
-      encode: true,
-      expected: "Ifmmp, Xpsme! 123"
-    },
-    {
-      name: "Empty Input",
-      input: "",
-      key: 1,
-      encode: true,
-      expected: ""
-    },
-    {
-      name: "Maximum Key",
-      input: "hello",
-      key: 25,
-      encode: true,
-      expected: "gdkkn"
-    },
-    {
-      name: "Zero Key",
-      input: "hello",
-      key: 0,
-      encode: true,
-      expected: "hello"
-    },
-    {
-      name: "Mixed Case",
-      input: "HeLlO WoRlD",
-      key: 1,
-      encode: true,
-      expected: "IfMmP XpSmE"
-    },
-    {
-      name: "Numbers Only",
-      input: "1234567890",
-      key: 1,
-      encode: true,
-      expected: "1234567890"
-    },
-    {
-      name: "Special Characters Only",
-      input: "!@#$%^&*()",
-      key: 1,
-      encode: true,
-      expected: "!@#$%^&*()"
-    },
-    {
-      name: "Long Text",
-      input: "The quick brown fox jumps over the lazy dog",
-      key: 13,
-      encode: true,
-      expected: "Gur dhvpx oebja sbk whzcf bire gur ynml qbt"
-    },
-    {
-      name: "Empty Key",
-      input: "hello",
-      key: "",
-      encode: true,
-      shouldError: true
-    },
-    {
-      name: "Whitespace Key",
-      input: "hello",
-      key: "  ",
-      encode: true,
-      shouldError: true
-    },
-    {
-      name: "Very Long Input",
-      input: "a".repeat(1000),
-      key: 1,
-      encode: true,
-      expected: "b".repeat(1000)
-    },
-    {
-      name: "Unicode Characters",
-      input: "Hello 🌍 World",
-      key: 1,
-      encode: true,
-      expected: "Ifmmp 🌍 Xpsme"
-    },
-    {
-      name: "Multiple Spaces",
-      input: "hello    world",
-      key: 1,
-      encode: true,
-      expected: "ifmmp    xpsme"
-    },
-    {
-      name: "Tabs and Newlines",
-      input: "hello\tworld\nhello",
-      key: 1,
-      encode: true,
-      expected: "ifmmp\txpsme\nifmmp"
-    }
-  ];
-
-  // Test error handling
-  console.log("\nTesting Error Handling...");
-  const errorTests = [
-    {
-      name: "Empty Key",
-      key: "",
-      shouldError: true,
-      expectedError: "Key is required"
-    },
-    {
-      name: "Whitespace Key",
-      key: "  ",
-      shouldError: true,
-      expectedError: "Key is required"
-    },
-    {
-      name: "Invalid Key (Negative)",
-      key: -1,
-      shouldError: true,
-      expectedError: "Key must be an integer between 0 and 25"
-    },
-    {
-      name: "Invalid Key (Too Large)",
-      key: 26,
-      shouldError: true,
-      expectedError: "Key must be an integer between 0 and 25"
-    },
-    {
-      name: "Invalid Key (Decimal)",
-      key: 1.5,
-      shouldError: true,
-      expectedError: "Key must be an integer between 0 and 25"
-    },
-    {
-      name: "Invalid Key (String)",
-      key: "abc",
-      shouldError: true,
-      expectedError: "Key must be an integer between 0 and 25"
-    }
-  ];
-
-  // Test UI Features
-  console.log("\nTesting UI Features...");
-  const uiTests = [
-    {
-      name: "Character Counter",
-      action: () => {
-        const textarea = document.getElementById("userMessage");
-        textarea.value = "test";
-        updateCharCount();
-        return document.getElementById("charCounter").textContent === "4/1000";
-      }
-    },
-    {
-      name: "Theme Toggle",
-      action: () => {
-        const initialTheme = document.body.getAttribute("data-theme");
-        toggleTheme();
-        const newTheme = document.body.getAttribute("data-theme");
-        toggleTheme(); // Reset
-        return initialTheme !== newTheme;
-      }
-    },
-    {
-      name: "Help Toggle",
-      action: () => {
-        const helpContent = document.getElementById("helpContent");
-        const initialDisplay = helpContent.style.display;
-        toggleHelp();
-        const newDisplay = helpContent.style.display;
-        toggleHelp(); // Reset
-        return initialDisplay !== newDisplay;
-      }
-    },
-    {
-      name: "Copy to Clipboard",
-      action: () => {
-        const output = document.getElementById("output");
-        output.value = "test";
-        copyToClipboard();
-        // Note: We can't actually verify clipboard content due to browser security
-        return true;
-      }
-    },
-    {
-      name: "Clear Form",
-      action: () => {
-        document.getElementById("userMessage").value = "test";
-        document.getElementById("userKey").value = "5";
-        clearForm();
-        return document.getElementById("userMessage").value === "" &&
-               document.getElementById("userKey").value === "1" &&
-               document.getElementById("output").value === "";
-      }
-    }
-  ];
-
-  // Run all tests
-  let allTestsPassed = true;
-
-  // Test cipher functionality
-  for (const test of testCases) {
-    if (test.shouldError) {
-      const errorElement = document.getElementById("keyError");
-      errorElement.style.display = "none";
-      document.getElementById("userKey").value = test.key;
-      enDeCode();
-      const errorShown = errorElement.style.display === "block";
-      if (!errorShown) {
-        console.error(`❌ Error Test Failed: ${test.name}`);
-        allTestsPassed = false;
-      } else {
-        console.log(`✅ Error Test Passed: ${test.name}`);
-      }
-    } else {
-      const result = testCipherCase(test.input, test.key, test.encode);
-      if (result !== test.expected) {
-        console.error(`❌ Test Failed: ${test.name}
-          Input: "${test.input}"
-          Key: ${test.key}
-          Encode: ${test.encode}
-          Expected: "${test.expected}"
-          Got: "${result}"`);
-        allTestsPassed = false;
-      } else {
-        console.log(`✅ Test Passed: ${test.name}`);
-      }
-    }
-  }
-
-  // Test error messages
-  for (const test of errorTests) {
-    const errorElement = document.getElementById("keyError");
-    errorElement.style.display = "none";
-    document.getElementById("userKey").value = test.key;
-    enDeCode();
-    const errorShown = errorElement.style.display === "block";
-    const errorMessage = errorElement.textContent;
-    
-    if (errorShown !== test.shouldError || (errorShown && errorMessage !== test.expectedError)) {
-      console.error(`❌ Error Message Test Failed: ${test.name}
-        Expected Error: ${test.expectedError}
-        Got Error: ${errorMessage}`);
-      allTestsPassed = false;
-    } else {
-      console.log(`✅ Error Message Test Passed: ${test.name}`);
-    }
-  }
-
-  // Test UI features
-  for (const test of uiTests) {
-    if (!test.action()) {
-      console.error(`❌ UI Test Failed: ${test.name}`);
-      allTestsPassed = false;
-    } else {
-      console.log(`✅ UI Test Passed: ${test.name}`);
-    }
-  }
-
-  if (allTestsPassed) {
-    console.log("\n🎉 All tests passed successfully!");
-  } else {
-    console.log("\n⚠️ Some tests failed. Please check the error messages above.");
-  }
-}
-
-function testCipherCase(input, key, encode) {
-  let outputMessage = [];
-  const cleanString = input.trim().toLowerCase();
-  
-  for (let i = 0; i < cleanString.length; i++) {
-    outputMessage.push(codeLetter(cleanString[i], key, encode));
-  }
-  
-  return outputMessage.join("");
-}
-
+/**
+ * Updates the character counter display
+ */
 function updateCharCount() {
   const textarea = document.getElementById("userMessage");
   const counter = document.getElementById("charCounter");
@@ -412,6 +152,9 @@ function updateCharCount() {
   counter.textContent = `${count}/1000`;
 }
 
+/**
+ * Copies the output text to the clipboard
+ */
 function copyToClipboard() {
   const output = document.getElementById("output");
   output.select();
@@ -426,6 +169,9 @@ function copyToClipboard() {
   }, 2000);
 }
 
+/**
+ * Toggles between light and dark themes
+ */
 function toggleTheme() {
   const body = document.body;
   const currentTheme = body.getAttribute("data-theme");
@@ -436,6 +182,9 @@ function toggleTheme() {
   localStorage.setItem("theme", newTheme);
 }
 
+/**
+ * Toggles the visibility of the help section
+ */
 function toggleHelp() {
   const helpContent = document.getElementById("helpContent");
   const helpToggle = document.querySelector('.help-toggle');
@@ -449,15 +198,186 @@ function toggleHelp() {
   }
 }
 
-// Initialize theme from localStorage
+/**
+ * Initializes the theme from localStorage
+ */
 function initTheme() {
   const savedTheme = localStorage.getItem("theme") || "light";
   document.body.setAttribute("data-theme", savedTheme);
 }
 
-// Run initialization when the page loads
+// Initialize the application when the page loads
 window.onload = function() {
   initTheme();
   testCipher();
   updateCharCount();
 };
+
+/**
+ * Test function to verify cipher functionality
+ */
+function testCipher() {
+  console.log("Running cipher tests...");
+  
+  // Test cases for rolling cipher
+  const testCases = [
+    {
+      name: "Basic Encoding with Rolling Key",
+      input: "hello",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "igpmo"
+    },
+    {
+      name: "Basic Decoding with Rolling Key",
+      input: "igpmo",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: false,
+      expected: "hello"
+    },
+    {
+      name: "Alphabet Wrap with Rolling Key",
+      input: "xyz",
+      baseKey: 1,
+      incrementKey: 2,
+      encode: true,
+      expected: "yac"
+    },
+    {
+      name: "Special Characters with Rolling Key",
+      input: "Hello, World!",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "Igpmo, Xpsme!"
+    },
+    {
+      name: "Empty Input",
+      input: "",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: ""
+    },
+    {
+      name: "Large Keys",
+      input: "hello",
+      baseKey: 25,
+      incrementKey: 25,
+      encode: true,
+      expected: "gdkkn"
+    },
+    {
+      name: "Zero Keys",
+      input: "hello",
+      baseKey: 0,
+      incrementKey: 0,
+      encode: true,
+      expected: "hello"
+    },
+    {
+      name: "Mixed Case with Rolling Key",
+      input: "HeLlO",
+      baseKey: 1,
+      incrementKey: 1,
+      encode: true,
+      expected: "IgPmO"
+    }
+  ];
+
+  // Test error handling
+  const errorTests = [
+    {
+      name: "Empty Base Key",
+      baseKey: "",
+      incrementKey: "1",
+      shouldError: true
+    },
+    {
+      name: "Empty Increment Key",
+      baseKey: "1",
+      incrementKey: "",
+      shouldError: true
+    },
+    {
+      name: "Invalid Base Key (Negative)",
+      baseKey: "-1",
+      incrementKey: "1",
+      shouldError: true
+    },
+    {
+      name: "Invalid Base Key (Too Large)",
+      baseKey: "26",
+      incrementKey: "1",
+      shouldError: true
+    },
+    {
+      name: "Invalid Increment Key (Decimal)",
+      baseKey: "1",
+      incrementKey: "1.5",
+      shouldError: true
+    }
+  ];
+
+  // Run all tests
+  let allTestsPassed = true;
+
+  // Test cipher functionality
+  for (const test of testCases) {
+    const result = testCipherCase(test.input, test.baseKey, test.incrementKey, test.encode);
+    if (result !== test.expected) {
+      console.error(`❌ Test Failed: ${test.name}
+        Input: "${test.input}"
+        Base Key: ${test.baseKey}
+        Increment Key: ${test.incrementKey}
+        Encode: ${test.encode}
+        Expected: "${test.expected}"
+        Got: "${result}"`);
+      allTestsPassed = false;
+    } else {
+      console.log(`✅ Test Passed: ${test.name}`);
+    }
+  }
+
+  // Test error handling
+  for (const test of errorTests) {
+    const errorElement = document.getElementById("keyError");
+    errorElement.style.display = "none";
+    document.getElementById("baseKey").value = test.baseKey;
+    document.getElementById("incrementKey").value = test.incrementKey;
+    enDeCode();
+    const errorShown = errorElement.style.display === "block";
+    
+    if (errorShown !== test.shouldError) {
+      console.error(`❌ Error Test Failed: ${test.name}`);
+      allTestsPassed = false;
+    } else {
+      console.log(`✅ Error Test Passed: ${test.name}`);
+    }
+  }
+
+  if (allTestsPassed) {
+    console.log("🎉 All tests passed successfully!");
+  } else {
+    console.log("⚠️ Some tests failed. Please check the error messages above.");
+  }
+}
+
+/**
+ * Helper function to test a single cipher case
+ * @param {string} input - The input text to process
+ * @param {number} baseKey - The base shift key
+ * @param {number} incrementKey - The increment for each position
+ * @param {boolean} encode - Whether to encode (true) or decode (false)
+ * @returns {string} The processed text
+ */
+function testCipherCase(input, baseKey, incrementKey, encode) {
+  let outputMessage = [];
+  for (let i = 0; i < input.length; i++) {
+    const currentKey = (Number(baseKey) + (i * Number(incrementKey))) % 26;
+    outputMessage.push(codeLetter(input[i], currentKey, encode));
+  }
+  return outputMessage.join("");
+}

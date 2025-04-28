@@ -3,209 +3,7 @@
   <head>
     <title>Caesar Cipher Encoder/Decoder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      :root {
-        --primary-color: #4CAF50;
-        --primary-hover: #45a049;
-        --error-color: #f44336;
-        --text-color: #333;
-        --background-color: #f5f5f5;
-        --border-color: #ddd;
-        --container-bg: white;
-      }
-
-      [data-theme="dark"] {
-        --text-color: #f5f5f5;
-        --background-color: #1a1a1a;
-        --border-color: #444;
-        --container-bg: #2d2d2d;
-      }
-
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 20px;
-        color: var(--text-color);
-        line-height: 1.6;
-        background-color: var(--background-color);
-        transition: background-color 0.3s, color 0.3s;
-      }
-
-      .container {
-        background-color: var(--container-bg);
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        transition: background-color 0.3s;
-      }
-
-      h1 {
-        color: var(--primary-color);
-        margin-bottom: 20px;
-        text-align: center;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-        position: relative;
-      }
-
-      label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-      }
-
-      textarea {
-        width: 100%;
-        padding: 12px;
-        margin: 5px 0;
-        border: 2px solid var(--border-color);
-        border-radius: 4px;
-        resize: vertical;
-        min-height: 100px;
-        transition: border-color 0.3s;
-        background-color: var(--container-bg);
-        color: var(--text-color);
-      }
-
-      textarea:focus {
-        outline: none;
-        border-color: var(--primary-color);
-      }
-
-      .char-counter {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-        font-size: 12px;
-        color: var(--text-color);
-        opacity: 0.7;
-      }
-
-      input[type="number"] {
-        width: 80px;
-        padding: 8px;
-        margin: 5px 0;
-        border: 2px solid var(--border-color);
-        border-radius: 4px;
-        background-color: var(--container-bg);
-        color: var(--text-color);
-      }
-
-      .radio-group {
-        margin: 15px 0;
-        display: flex;
-        gap: 20px;
-      }
-
-      .radio-option {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-      }
-
-      .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-      }
-
-      button {
-        padding: 12px 24px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s;
-        flex: 1;
-      }
-
-      button:hover {
-        background-color: var(--primary-hover);
-      }
-
-      button:focus {
-        outline: 2px solid var(--primary-color);
-        outline-offset: 2px;
-      }
-
-      .error-message {
-        color: var(--error-color);
-        margin-top: 5px;
-        font-size: 14px;
-        display: none;
-      }
-
-      .success-message {
-        color: var(--primary-color);
-        margin-top: 5px;
-        font-size: 14px;
-        display: none;
-      }
-
-      .theme-toggle {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      .help-toggle {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        padding: 8px 16px;
-        background-color: var(--primary-color);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      .help-content {
-        display: none;
-        margin-top: 20px;
-        padding: 20px;
-        background-color: var(--container-bg);
-        border-radius: 4px;
-        border: 1px solid var(--border-color);
-      }
-
-      .help-content h2 {
-        color: var(--primary-color);
-        margin-top: 0;
-      }
-
-      @media (max-width: 480px) {
-        .container {
-          padding: 15px;
-        }
-        
-        .radio-group {
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .button-group {
-          flex-direction: column;
-        }
-
-        .theme-toggle, .help-toggle {
-          position: static;
-          margin-bottom: 10px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
@@ -287,20 +85,36 @@
         </div>
         
         <div class="form-group">
-          <label for="userKey">Key (0-25):</label>
+          <label for="baseKey">Base Key (0-25):</label>
           <input 
             type="number" 
+            id="baseKey" 
+            name="baseKey" 
             min="0" 
             max="25" 
-            id="userKey" 
             value="1" 
+            required
             onchange="enDeCode()"
-            aria-label="Cipher key"
+            aria-label="Base key"
             aria-required="true"
           />
-          <div id="keyError" class="error-message" role="alert">
-            Key must be between 0 and 25
-          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="incrementKey">Increment Key (0-25):</label>
+          <input 
+            type="number" 
+            id="incrementKey" 
+            name="incrementKey" 
+            min="0" 
+            max="25" 
+            value="1" 
+            required
+            onchange="enDeCode()"
+            aria-label="Increment key"
+            aria-required="true"
+          />
+          <small class="help-text">The shift changes by this amount for each letter</small>
         </div>
         
         <div class="form-group">
@@ -313,6 +127,9 @@
           ></textarea>
           <div id="successMessage" class="success-message" role="status">
             Message processed successfully
+          </div>
+          <div id="keyError" class="error-message" role="alert">
+            Key must be between 0 and 25
           </div>
         </div>
         
