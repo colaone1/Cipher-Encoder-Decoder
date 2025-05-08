@@ -17,7 +17,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  max-width: 600px;
+  max-width: 800px;
   margin: 20px auto;
   padding: 20px;
   color: var(--text-color);
@@ -32,6 +32,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   transition: background-color 0.3s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 h1 {
@@ -142,28 +144,25 @@ button:focus {
   display: none;
 }
 
-.theme-toggle {
+.theme-toggle, .help-toggle {
   position: fixed;
-  top: 20px;
-  right: 20px;
   padding: 8px 16px;
   background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  z-index: 1000;
+}
+
+.theme-toggle {
+  top: 20px;
+  right: 20px;
 }
 
 .help-toggle {
-  position: fixed;
   top: 20px;
   left: 20px;
-  padding: 8px 16px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 .help-content {
@@ -180,7 +179,43 @@ button:focus {
   margin-top: 0;
 }
 
+/* Responsive Design */
+@media (max-width: 1200px) {
+  body {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+    margin: 10px auto;
+  }
+
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .button-group {
+    gap: 8px;
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
 @media (max-width: 480px) {
+  body {
+    padding: 10px;
+    margin: 5px auto;
+  }
+
   .container {
     padding: 15px;
   }
@@ -196,6 +231,38 @@ button:focus {
 
   .theme-toggle, .help-toggle {
     position: static;
-    margin-bottom: 10px;
+    margin: 10px 0;
+    width: 100%;
+  }
+
+  textarea {
+    min-height: 80px;
+    padding: 8px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 8px;
+  }
+
+  .char-counter {
+    position: static;
+    margin-top: 5px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  button {
+    padding: 12px 24px;
+    min-height: 44px;
+  }
+
+  input[type="number"] {
+    min-height: 44px;
+  }
+
+  textarea {
+    min-height: 120px;
   }
 } 
